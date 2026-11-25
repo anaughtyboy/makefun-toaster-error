@@ -28,6 +28,10 @@ for (const ch of line) {
     fail("entry must not contain control characters");
   }
 }
+// The gate also refuses a line that is only whitespace.
+if (line.trim().length === 0) {
+  fail("entry must contain non-whitespace text");
+}
 
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outputDir, { recursive: true });
@@ -39,6 +43,9 @@ writeFileSync(target, bytes);
 // Read the file back as raw bytes and prove it is exactly our line,
 // with no trailing newline smuggled in.
 const written = readFileSync(target);
+if (written.length !== bytes.length) {
+  fail("read-back byte length differs from the entry line");
+}
 if (!written.equals(bytes)) {
   fail("read-back bytes differ from the entry line");
 }
